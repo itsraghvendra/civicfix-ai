@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CivicFix AI — Lucknow Civic Grievance Management</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'soft-white': '#E8E9DF',
+            'sage-green': '#A9B887',
+            'sage-light': '#E8EDE0',
+            'deep-olive': '#2E3D28',
+            'deep-olive-hover': '#3B4D34',
+            'deep-olive-dark': '#222E1E',
+            'text-main': '#1E251B',
+            'text-muted': '#576352',
+            'border-subtle': '#D5D7C9',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          borderRadius: {
+            'DEFAULT': '8px',
+            'lg': '8px',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Cloudflare Turnstile CAPTCHA (Optional / Configurable) -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+  <!-- Custom Styles & Offline Fallback -->
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body class="bg-[#E8E9DF] text-[#1E251B] min-h-screen flex flex-col md:flex-row antialiased font-sans">
+
+  <!-- =========================================================
+       SIDEBAR / RESPONSIVE NAVIGATION (Deep Olive #2E3D28)
+       ========================================================= -->
+  <aside class="w-full md:w-64 bg-[#2E3D28] text-white flex-shrink-0 flex flex-col justify-between border-r border-[#E8E9DF]/10">
+    <div class="p-5">
+      <!-- Brand & Logo -->
+      <div class="flex items-center gap-3 pb-5 border-b border-[#E8E9DF]/15">
+        <div class="w-9 h-9 rounded bg-[#A9B887] text-[#2E3D28] font-black text-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+          CF
+        </div>
+        <div>
+          <div class="font-bold text-base tracking-tight text-white leading-tight">CIVICFIX AI</div>
+          <div class="text-[11px] text-[#E8E9DF]/80">Lucknow, Uttar Pradesh</div>
+        </div>
+      </div>
+      <div class="mt-2.5 text-xs text-[#A9B887] font-medium tracking-tight">
+        "Together, Let's Make Lucknow Better."
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="mt-6 flex flex-col gap-1.5" aria-label="Main Navigation">
+        <button data-tab="home" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3">
+          <i data-lucide="home" class="w-4 h-4"></i>
+          <span>Home</span>
+        </button>
+        <button data-tab="submit" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3">
+          <i data-lucide="file-plus" class="w-4 h-4"></i>
+          <span>Report an Issue</span>
+        </button>
+        <button data-tab="track" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3">
+          <i data-lucide="search" class="w-4 h-4"></i>
+          <span>Track Complaint</span>
+        </button>
+        <button data-tab="how-it-works" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3">
+          <i data-lucide="help-circle" class="w-4 h-4"></i>
+          <span>How It Works</span>
+        </button>
+        <button data-tab="about" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-3">
+          <i data-lucide="info" class="w-4 h-4"></i>
+          <span>About</span>
+        </button>
+
+        <div class="my-2 border-t border-[#E8E9DF]/10"></div>
+
+        <!-- Visually Distinct Admin Portal Navigation Button -->
+        <button data-tab="admin" class="nav-btn w-full text-left px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center justify-between border border-[#A9B887]/40 bg-white/5 hover:bg-white/10 text-[#E8E9DF]">
+          <div class="flex items-center gap-3">
+            <i data-lucide="shield-check" class="w-4 h-4 text-[#A9B887]"></i>
+            <span>Admin Portal</span>
+          </div>
+          <span class="text-[10px] bg-[#A9B887]/20 text-[#A9B887] px-1.5 py-0.5 rounded border border-[#A9B887]/30">Demo</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Sidebar Bottom Status & Disclaimer -->
+    <div class="p-5 border-t border-[#E8E9DF]/10 space-y-3">
+      <div>
+        <div class="text-[11px] font-semibold uppercase tracking-wider text-[#A9B887] mb-1">
+          Classification Engine
+        </div>
+        <div id="sidebar-engine-pill" class="flex items-center gap-2 text-xs text-[#E8E9DF]">
+          <span class="w-2 h-2 rounded-full bg-[#A9B887]"></span>
+          <span>Loading Engine...</span>
+        </div>
+      </div>
+
+      <div class="text-[11px] text-[#E8E9DF]/70 bg-black/20 p-2.5 rounded-md leading-relaxed">
+        Demonstration prototype for Lucknow civic affairs. Life-safety emergencies: Dial <strong>112</strong> immediately.
+      </div>
+    </div>
+  </aside>
+
+  <!-- =========================================================
+       MAIN CANVAS AREA
+       ========================================================= -->
+  <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+
+    <!-- =======================================================
+         SCREEN 1: CITIZEN HOME (DEFAULT OPENING SCREEN)
+         ======================================================= -->
+    <section id="screen-home" class="max-w-6xl mx-auto space-y-8">
+      
+      <!-- Lucknow Hero Banner (Bara Imambara / Rumi Darwaza) -->
+      <div class="relative rounded-lg overflow-hidden shadow-sm min-h-[380px] flex items-center border border-[#D5D7C9]" role="region" aria-label="Lucknow Civic Banner">
+        <img src="/assets/lucknow_hero.jpg" alt="Architectural view of the historic Rumi Darwaza in Lucknow, Uttar Pradesh" class="absolute inset-0 w-full h-full object-cover z-0" />
+        <div class="absolute inset-0 bg-gradient-to-r from-[#2E3D28]/95 via-[#2E3D28]/85 to-[#2E3D28]/70 z-10"></div>
+        <div class="relative z-20 p-6 md:p-12 max-w-2xl text-white">
+          <div class="inline-flex items-center gap-2 bg-[#A9B887]/25 border border-[#A9B887]/50 text-white px-3 py-1 rounded text-xs font-semibold tracking-wide mb-4 backdrop-blur-sm">
+            <span>📍 Serving Lucknow</span>
+            <span class="opacity-60">•</span>
+            <span>Municipal Grievance Redressal</span>
+          </div>
+          <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight mb-3">
+            Let's Make Lucknow Better.
+          </h1>
+          <p class="text-[#E8E9DF] text-sm md:text-base leading-relaxed mb-6 opacity-95">
+            Spotted a pothole, overflowing garbage, a broken streetlight, or a water leak? Report local civic issues, share a photo, and track your complaint through one simple platform.
+          </p>
+          <div class="flex flex-wrap items-center gap-3">
+            <button onclick="renderTab('submit')" class="btn-primary">
+              <i data-lucide="file-plus" class="w-4 h-4"></i>
+              <span>Report a Civic Issue</span>
+            </button>
+            <button onclick="renderTab('track')" class="btn-secondary">
+              <i data-lucide="search" class="w-4 h-4"></i>
+              <span>Track My Complaint</span>
+            </button>
+          </div>
+          <div class="mt-6 flex items-center gap-2 text-xs text-[#E8E9DF]/80">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#A9B887]"></i>
+            <span>Community-powered reporting · AI-assisted organization · Human-reviewed workflow</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Civic Impact / Motivation Section -->
+      <div class="bg-white rounded-lg border border-[#D5D7C9] p-6 md:p-8 shadow-sm space-y-6">
+        <div>
+          <h2 class="text-xl md:text-2xl font-bold text-[#2E3D28] tracking-tight">Small Reports. Better Streets. Stronger Communities.</h2>
+          <p class="text-sm text-[#576352] mt-1 leading-relaxed max-w-3xl">
+            A cleaner, safer city begins when people care about the places they share. Every thoughtful report helps make local issues easier to organize, review, and track.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-5 rounded-lg border border-[#D5D7C9] bg-[#F8F9F5] hover:border-[#A9B887] transition-all space-y-2">
+            <div class="w-10 h-10 rounded-lg bg-[#2E3D28] text-[#A9B887] flex items-center justify-center font-bold">
+              <i data-lucide="eye" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-base text-[#2E3D28]">1. Notice It</h3>
+            <p class="text-xs text-[#576352] leading-relaxed">
+              Spot a civic issue in your neighbourhood. Whether it is a dark road, overflowing waste bin, or broken water line.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-lg border border-[#D5D7C9] bg-[#F8F9F5] hover:border-[#A9B887] transition-all space-y-2">
+            <div class="w-10 h-10 rounded-lg bg-[#2E3D28] text-[#A9B887] flex items-center justify-center font-bold">
+              <i data-lucide="camera" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-base text-[#2E3D28]">2. Report It</h3>
+            <p class="text-xs text-[#576352] leading-relaxed">
+              Share the details and upload a photo to help explain the problem. Select your Lucknow locality with ease.
+            </p>
+          </div>
+
+          <div class="p-5 rounded-lg border border-[#D5D7C9] bg-[#F8F9F5] hover:border-[#A9B887] transition-all space-y-2">
+            <div class="w-10 h-10 rounded-lg bg-[#2E3D28] text-[#A9B887] flex items-center justify-center font-bold">
+              <i data-lucide="clock" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-base text-[#2E3D28]">3. Track It</h3>
+            <p class="text-xs text-[#576352] leading-relaxed">
+              Use your unique tracking ID to follow status updates in this prototype from triage through resolution.
+            </p>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-lg bg-[#E8EDE0] border border-[#A9B887]/60 text-xs text-[#2E3D28] font-medium flex items-center gap-3">
+          <i data-lucide="heart" class="w-5 h-5 text-[#2E3D28] flex-shrink-0"></i>
+          <span>"Your neighbourhood matters. Your voice matters. Let's build a better Lucknow together."</span>
+        </div>
+      </div>
+
+      <!-- Lucknow Visual Gallery: The City We Care About -->
+      <div class="bg-white rounded-lg border border-[#D5D7C9] p-6 md:p-8 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-[#D5D7C9]/60">
+          <div>
+            <h2 class="text-lg md:text-xl font-bold text-[#2E3D28]">The City We Care About</h2>
+            <p class="text-xs text-[#576352]">Preserving Lucknow's heritage, green public spaces, and civic beauty</p>
+          </div>
+          <span class="text-xs text-[#2E3D28] font-semibold bg-[#E8EDE0] px-2.5 py-1 rounded">Heritage & Environment</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1: Rumi Darwaza -->
+          <div class="group border border-[#D5D7C9] rounded-lg overflow-hidden hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="h-40 overflow-hidden bg-[#2E3D28]/10">
+              <img src="/assets/lucknow_hero.jpg" alt="Rumi Darwaza gateway in Lucknow" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            </div>
+            <div class="p-3.5 space-y-1">
+              <div class="text-sm font-bold text-[#2E3D28]">Rumi Darwaza</div>
+              <div class="text-[11px] text-[#576352] leading-relaxed">
+                Historic 1784 Awadhi gateway connecting ancient and modern Lucknow heritage routes.
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Bara Imambara -->
+          <div class="group border border-[#D5D7C9] rounded-lg overflow-hidden hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="h-40 overflow-hidden bg-[#2E3D28]/10">
+              <img src="/assets/bara_imambara.jpg" alt="Bara Imambara monument in Lucknow" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            </div>
+            <div class="p-3.5 space-y-1">
+              <div class="text-sm font-bold text-[#2E3D28]">Bara Imambara</div>
+              <div class="text-[11px] text-[#576352] leading-relaxed">
+                Grand architectural marvel featuring the celebrated Bhulbhulaiya acoustic labyrinth.
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Gomti Riverfront -->
+          <div class="group border border-[#D5D7C9] rounded-lg overflow-hidden hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="h-40 overflow-hidden bg-[#2E3D28]/10">
+              <img src="/assets/gomti_riverfront.jpg" alt="Gomti Riverfront promenade Lucknow" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            </div>
+            <div class="p-3.5 space-y-1">
+              <div class="text-sm font-bold text-[#2E3D28]">Gomti Riverfront</div>
+              <div class="text-[11px] text-[#576352] leading-relaxed">
+                Scenic river promenade, cycling avenues, and fountains revitalizing city waterfronts.
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Janeshwar Mishra Park -->
+          <div class="group border border-[#D5D7C9] rounded-lg overflow-hidden hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="h-40 overflow-hidden bg-[#2E3D28]/10">
+              <img src="/assets/janeshwar_park.jpg" alt="Janeshwar Mishra Park green landscape Lucknow" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            </div>
+            <div class="p-3.5 space-y-1">
+              <div class="text-sm font-bold text-[#2E3D28]">Janeshwar Mishra Park</div>
+              <div class="text-[11px] text-[#576352] leading-relaxed">
+                Asia's largest eco-friendly urban park, home to sprawling wetlands, jogging paths, and biodiversity.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supported Grievance Categories -->
+      <div class="bg-white rounded-lg border border-[#D5D7C9] p-6 md:p-8 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 mb-4 border-b border-[#D5D7C9]/60 gap-1">
+          <h2 class="text-lg font-bold text-[#2E3D28]">Supported Grievance Categories</h2>
+          <span class="text-xs text-[#576352]">Assisted by Groq AI and deterministic municipal rules</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="border border-[#D5D7C9]/70 rounded-lg p-4 hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="text-sm font-semibold text-[#2E3D28] mb-1">Roads & potholes</div>
+            <div class="text-xs text-[#576352] leading-relaxed">Craters, road cave-ins, broken dividers, speed breaker hazards.</div>
+          </div>
+          <div class="border border-[#D5D7C9]/70 rounded-lg p-4 hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="text-sm font-semibold text-[#2E3D28] mb-1">Garbage & sanitation</div>
+            <div class="text-xs text-[#576352] leading-relaxed">Overflowing community bins, missing garbage pickup, public stench.</div>
+          </div>
+          <div class="border border-[#D5D7C9]/70 rounded-lg p-4 hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="text-sm font-semibold text-[#2E3D28] mb-1">Streetlights</div>
+            <div class="text-xs text-[#576352] leading-relaxed">Dark pedestrian stretches, broken fixtures, flickering bulbs.</div>
+          </div>
+          <div class="border border-[#D5D7C9]/70 rounded-lg p-4 hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="text-sm font-semibold text-[#2E3D28] mb-1">Water supply & leakage</div>
+            <div class="text-xs text-[#576352] leading-relaxed">Ruptured water mains, zero tap pressure, contaminated water.</div>
+          </div>
+          <div class="border border-[#D5D7C9]/70 rounded-lg p-4 hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="text-sm font-semibold text-[#2E3D28] mb-1">Drainage & sewage</div>
+            <div class="text-xs text-[#576352] leading-relaxed">Overflowing storm drains, clogged sewers, backflow, waterlogging.</div>
+          </div>
+          <div class="border border-[#D5D7C9]/70 rounded-lg p-4 hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="text-sm font-semibold text-[#2E3D28] mb-1">Public safety / hazard</div>
+            <div class="text-xs text-[#576352] leading-relaxed">Live dangling power cables, open manholes, fallen tree branches.</div>
+          </div>
+          <div class="border border-[#D5D7C9]/70 rounded-lg p-4 hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="text-sm font-semibold text-[#2E3D28] mb-1">Parks & public spaces</div>
+            <div class="text-xs text-[#576352] leading-relaxed">Broken public park swings, untrimmed vegetation, damaged paths.</div>
+          </div>
+          <div class="border border-[#D5D7C9]/70 rounded-lg p-4 hover:border-[#A9B887] transition-all bg-[#F8F9F5]">
+            <div class="text-sm font-semibold text-[#2E3D28] mb-1">Other / needs review</div>
+            <div class="text-xs text-[#576352] leading-relaxed">General civic grievances requiring customized municipal evaluation.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prototype Disclaimer Footer -->
+      <footer class="bg-white border border-[#D5D7C9] rounded-lg p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs text-[#576352] gap-3">
+        <div class="max-w-2xl leading-relaxed">
+          <strong class="text-[#2E3D28]">Disclaimer:</strong> CIVICFIX AI is an independent demonstration prototype. It is not an official government portal and does not send complaints to municipal authorities.
+        </div>
+        <div class="font-medium text-[#2E3D28] flex-shrink-0">
+          Lucknow Civic Tech Prototype • 2026
+        </div>
+      </footer>
+    </section>
+
+
+    <!-- =======================================================
+         SCREEN 2: SUBMIT COMPLAINT (WITH PHOTO UPLOAD & LOCALITY DUAL INPUT)
+         ======================================================= -->
+    <section id="screen-submit" class="max-w-4xl mx-auto space-y-6 hidden">
+      <div>
+        <h1 class="text-2xl font-bold text-[#2E3D28] tracking-tight">Report a Civic Issue</h1>
+        <p class="text-sm text-[#576352] mt-1">
+          Share details about an issue in Lucknow. Our classification engine organizes and transparently prioritizes your report.
+        </p>
+      </div>
+
+      <!-- Immediate Danger Alert Banner -->
+      <div class="bg-[#FEF2F2] border border-[#FCA5A5] rounded-lg p-4 flex items-start gap-3 text-xs text-[#991B1B]">
+        <i data-lucide="alert-octagon" class="w-5 h-5 flex-shrink-0 text-[#B91C1C]"></i>
+        <div class="leading-relaxed">
+          <strong>Immediate Danger Notice:</strong> If this issue involves an immediate life-safety risk (e.g. fallen high-voltage live wires, gas leak, active fire, structural collapse), please dial <strong>112 (Emergency Police/Rescue)</strong> or <strong>101 (Fire)</strong> directly. CIVICFIX AI is a demonstration prototype and does not provide emergency dispatch.
+        </div>
+      </div>
+
+      <!-- Complaint Submission Form Card -->
+      <div class="bg-white rounded-lg border border-[#D5D7C9] p-6 shadow-sm">
+        <form id="complaint-form" class="space-y-5">
+          
+          <!-- 1. Title Input -->
+          <div class="space-y-1">
+            <label for="complaint-title" class="block text-xs font-semibold text-[#2E3D28]">Complaint Title *</label>
+            <input type="text" id="complaint-title" required placeholder="e.g. Deep pothole cluster near Hazratganj metro gate 2" 
+              class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3.5 py-2 text-sm text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28] focus:border-[#2E3D28]" />
+            <p class="text-[11px] text-[#576352]">Brief headline summarizing the issue</p>
+          </div>
+
+          <!-- 2. Mandatory Locality Selection + Write-in Option -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-1">
+              <label for="locality-select" class="block text-xs font-semibold text-[#2E3D28]">Select Locality (Lucknow) *</label>
+              <select id="locality-select" required class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3.5 py-2 text-sm text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]">
+                <!-- Populated dynamically with Lucknow neighborhoods -->
+              </select>
+              <p class="text-[11px] text-[#576352]">Select neighborhood or choose "Other / Enter manually"</p>
+            </div>
+
+            <div class="space-y-1">
+              <label for="locality-custom-input" id="locality-custom-label" class="block text-xs font-semibold text-[#2E3D28]">
+                Enter Locality or Landmark
+              </label>
+              <input type="text" id="locality-custom-input" placeholder="e.g. Near Halwasiya Market, Opp. Gate 3"
+                class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3.5 py-2 text-sm text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]" />
+              <p id="locality-custom-hint" class="text-[11px] text-[#576352]">Optional landmark or specific street details</p>
+            </div>
+          </div>
+
+          <!-- 3. Detailed Description Input -->
+          <div class="space-y-1">
+            <label for="complaint-desc" class="block text-xs font-semibold text-[#2E3D28]">Detailed Description *</label>
+            <textarea id="complaint-desc" rows="4" required placeholder="Please detail the location, severity, whether it blocks vehicular traffic, poses pedestrian risk, or affects drinking water..."
+              class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3.5 py-2 text-sm text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]"></textarea>
+            <p class="text-[11px] text-[#576352]">Clear descriptions help our engine accurately assign priority and dispatch the correct municipal crew</p>
+          </div>
+
+          <!-- 4. Mandatory Photo Upload Component (Compulsory Live Photo Capture & Captioning) -->
+          <div class="space-y-3 border-t border-[#D5D7C9]/60 pt-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <label class="block text-xs font-semibold text-[#2E3D28]">
+                  Live Photo Evidence * <span class="text-[#B91C1C] font-semibold">(Compulsory)</span>
+                </label>
+                <p class="text-[11px] text-[#576352] mt-0.5 leading-relaxed">
+                  A photo is compulsory to help municipal teams inspect severity. Use your live camera or upload an image file. Avoid faces, license plates, or identity documents.
+                </p>
+              </div>
+              <div class="flex gap-2 flex-shrink-0">
+                <button type="button" id="start-camera-btn" class="btn-secondary text-xs h-8">
+                  <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                  <span>Live Camera</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Camera Viewfinder Modal / Inline Stream -->
+            <div id="camera-stream-box" class="hidden p-3 bg-black rounded-lg space-y-3 text-center">
+              <video id="camera-video-feed" autoplay playsinline class="w-full max-h-64 object-contain rounded bg-neutral-900 mx-auto"></video>
+              <canvas id="camera-capture-canvas" class="hidden"></canvas>
+              <div class="flex gap-3 justify-center">
+                <button type="button" id="snap-photo-btn" class="btn-primary text-xs">
+                  <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                  <span>Capture Live Photo</span>
+                </button>
+                <button type="button" id="close-camera-btn" class="btn-secondary text-xs bg-white text-black">
+                  <span>Cancel Camera</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Upload Drop Zone -->
+            <div id="photo-drop-zone" class="border-2 border-dashed border-[#D5D7C9] hover:border-[#A9B887] rounded-lg p-5 text-center cursor-pointer bg-[#F8F9F5] transition-colors">
+              <input type="file" id="photo-file-input" accept="image/jpeg,image/png,image/webp,image/jpg" capture="environment" class="hidden" />
+              <div id="drop-zone-prompt" class="space-y-2">
+                <i data-lucide="camera" class="w-8 h-8 mx-auto text-[#576352]"></i>
+                <div class="text-xs text-[#2E3D28]">
+                  <span class="font-semibold text-[#2E3D28] underline">Click to snap / browse</span> or drag and drop image here
+                </div>
+                <div class="text-[11px] text-[#576352]">Supported formats: JPEG, JPG, PNG, WebP (Max 5 MB)</div>
+              </div>
+
+              <!-- Image Preview Container -->
+              <div id="photo-preview-container" class="hidden flex flex-col sm:flex-row items-center gap-4 text-left">
+                <img id="photo-preview-img" src="" alt="Citizen complaint preview" class="w-24 h-24 object-cover rounded-md border border-[#D5D7C9]" />
+                <div class="flex-1 space-y-1">
+                  <div id="photo-file-name" class="text-xs font-semibold text-[#2E3D28] truncate max-w-xs"></div>
+                  <div id="photo-file-size" class="text-[11px] text-[#576352]"></div>
+                  <div class="flex gap-2 pt-1">
+                    <button type="button" id="photo-remove-btn" class="text-xs text-[#B91C1C] hover:underline font-medium">Remove image</button>
+                    <span class="text-[#D5D7C9]">•</span>
+                    <button type="button" id="photo-change-btn" class="text-xs text-[#2E3D28] hover:underline font-medium">Change image</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="photo-error-msg" class="hidden text-xs text-[#B91C1C] font-medium"></div>
+
+            <!-- Live Image Captioning Evidence Box -->
+            <div id="image-caption-box" class="hidden p-3 bg-[#F8F9F5] border border-[#D5D7C9] rounded-lg text-xs space-y-1">
+              <div class="font-semibold text-[#2E3D28] flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#A9B887]"></i>
+                <span>Live Image Caption (Visual Evidence Review):</span>
+              </div>
+              <input type="text" id="image-caption-input" placeholder="Field photo evidence of civic issue"
+                class="w-full bg-white border border-[#D5D7C9] rounded px-2.5 py-1 text-xs text-[#1E251B] focus:outline-none focus:ring-1 focus:ring-[#2E3D28]" />
+              <div class="text-[10px] text-[#576352]">Auto-generated evidence caption. You may refine if needed.</div>
+            </div>
+          </div>
+
+          <!-- 5. Optional Location Sharing (Private for Municipal Field Crews) -->
+          <div class="space-y-2 border-t border-[#D5D7C9]/60 pt-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <label class="block text-xs font-semibold text-[#2E3D28]">
+                  Incident Location Coordinates <span class="text-[#576352] font-normal">(Optional)</span>
+                </label>
+                <p class="text-[11px] text-[#576352] leading-relaxed">
+                  Optionally attach your GPS coordinates to assist municipal crew navigation.
+                </p>
+              </div>
+              <button type="button" id="btn-share-location" class="btn-secondary text-xs h-8 flex-shrink-0">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                <span>Attach Current Location</span>
+              </button>
+            </div>
+
+            <!-- Location Attached Badge -->
+            <div id="location-attached-badge" class="hidden bg-[#F0FDF4] border border-[#BBF7D0] text-[#166534] p-3 rounded-lg text-xs flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 text-[#16A34A]"></i>
+                <span id="location-coords-text" class="font-mono"></span>
+              </div>
+              <button type="button" id="btn-remove-location" class="text-xs text-[#B91C1C] hover:underline font-medium">Remove</button>
+            </div>
+
+            <div class="text-[10px] text-[#576352] leading-tight bg-[#F8F9F5] p-2 rounded border border-[#D5D7C9]/60">
+              <strong>Notice:</strong> Location sharing is optional. Coordinates are securely stored for municipal response navigation and are never displayed publicly on tracking pages. Location sharing does not prove citizen identity or that the issue originated at this location.
+            </div>
+          </div>
+
+          <!-- 6. Passwordless Mobile OTP Verification (Configurable / Optional) -->
+          <div class="space-y-3 border-t border-[#D5D7C9]/60 pt-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <label class="block text-xs font-semibold text-[#2E3D28]">
+                  Mobile Verification <span id="otp-requirement-badge" class="text-[#576352] font-normal">(Optional)</span>
+                </label>
+                <span id="otp-verified-chip" class="hidden bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded border border-green-300">
+                  ✓ Verified
+                </span>
+              </div>
+              <p class="text-[11px] text-[#576352] mt-0.5 leading-relaxed">
+                Verify control of your mobile number with a one-time code to prevent automated spam. No account or password required. Phone numbers are protected under municipal privacy standard and never displayed publicly.
+              </p>
+            </div>
+
+            <!-- Phone Input and Send Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div class="sm:col-span-2">
+                <input type="tel" id="otp-phone-input" placeholder="+91 98765 43210"
+                  class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3.5 py-2 text-sm text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]" />
+              </div>
+              <div>
+                <button type="button" id="otp-send-btn" class="btn-secondary w-full text-xs h-[38px]">
+                  <span id="otp-send-text">Send Code</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- OTP Verification Code Entry Row -->
+            <div id="otp-verify-row" class="hidden space-y-2 bg-[#F8F9F5] p-3 rounded-lg border border-[#D5D7C9]">
+              <div class="text-xs font-semibold text-[#2E3D28]">Enter 6-Digit Verification Code:</div>
+              <div class="flex gap-2">
+                <input type="text" id="otp-code-input" maxlength="6" placeholder="123456"
+                  class="w-36 bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-sm font-mono tracking-widest text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]" />
+                <button type="button" id="otp-verify-btn" class="btn-primary text-xs h-[38px]">
+                  <span>Verify Code</span>
+                </button>
+              </div>
+              <div id="otp-timer-box" class="text-[11px] text-[#576352]">
+                Code expires in <span id="otp-expiry-countdown" class="font-bold">300</span>s. Resend available in <span id="otp-resend-countdown" class="font-bold">60</span>s.
+              </div>
+              <div id="otp-demo-helper" class="hidden text-[11px] text-[#2E3D28] bg-[#E8EDE0] p-2 rounded border border-[#A9B887]"></div>
+            </div>
+
+            <div id="otp-msg-box" class="hidden text-xs font-medium"></div>
+
+            <div class="text-[10px] text-[#576352]">
+              OTP verifies control of a phone number to prevent automated spam. It does not verify legal citizen identity.
+            </div>
+          </div>
+
+          <!-- 7. Adaptive Security Verification (CAPTCHA / Cryptographic Challenge) -->
+          <div id="captcha-container" class="hidden space-y-3 border-t border-[#D5D7C9]/60 pt-4 bg-[#F8F9F5] p-4 rounded-lg border border-[#D5D7C9]">
+            <div class="flex items-center gap-2 text-xs font-bold text-[#B45309]">
+              <i data-lucide="shield-alert" class="w-4 h-4"></i>
+              <span>Security Check Required</span>
+            </div>
+            <p id="captcha-reason-text" class="text-[11px] text-[#576352]">
+              Suspicious activity or repeated requests detected. Please complete security verification to proceed.
+            </p>
+
+            <!-- Cloudflare Turnstile Box -->
+            <div id="turnstile-wrapper" class="hidden">
+              <div id="turnstile-widget"></div>
+            </div>
+
+            <!-- Fallback Cryptographic Challenge Box -->
+            <div id="crypto-challenge-wrapper" class="hidden space-y-2 p-3 bg-white rounded border border-[#D5D7C9]">
+              <div id="crypto-question-label" class="text-xs font-semibold text-[#2E3D28]">Security Question</div>
+              <div class="flex items-center gap-2">
+                <input type="text" id="crypto-answer-input" placeholder="Your answer"
+                  class="w-32 bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-xs text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]" />
+                <button type="button" id="crypto-verify-btn" class="btn-secondary text-xs h-[32px]">
+                  <span>Verify</span>
+                </button>
+              </div>
+              <div id="crypto-feedback" class="text-[11px] font-medium hidden"></div>
+            </div>
+          </div>
+
+          <!-- Real-time Duplicate Advisory Notice Banner -->
+          <div id="duplicate-advisory-banner" class="hidden bg-[#FFFBEB] border border-[#FCD34D] rounded-lg p-3 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-[#B45309] font-bold">⚠️ Possible Similar Complaint Detected</span>
+              <span id="dup-match-score" class="bg-[#FEF3C7] text-[#92400E] px-2 py-0.5 rounded text-[11px] font-semibold"></span>
+            </div>
+            <div id="dup-match-text" class="text-[#78350F] mt-1 leading-relaxed"></div>
+          </div>
+
+          <!-- Submit Action Button -->
+          <div class="pt-2 flex items-center gap-4">
+            <button type="submit" id="submit-complaint-btn" class="btn-primary">
+              <span id="submit-btn-spinner" class="hidden animate-spin mr-2">⟳</span>
+              <span id="submit-btn-text">Submit complaint</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Submission Success Feedback Card -->
+      <div id="submission-success-card" class="hidden bg-white border-2 border-[#A9B887] rounded-lg p-6 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[#D5D7C9]/60 gap-2">
+          <div>
+            <div class="text-xs uppercase tracking-wider font-semibold text-[#576352]">Grievance Registered Inside Prototype</div>
+            <h2 class="text-xl font-bold text-[#2E3D28] mt-0.5">Tracking ID: <span id="success-tracking-id"></span></h2>
+          </div>
+          <div>
+            <span class="badge badge-status-submitted px-2.5 py-1 rounded text-xs font-semibold">Submitted</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-2">
+          <div>
+            <div class="text-xs font-semibold text-[#576352]">Assigned Category</div>
+            <div id="success-category" class="font-semibold text-sm text-[#2E3D28] mt-0.5"></div>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-[#576352]">Priority Rating</div>
+            <div id="success-priority-badge" class="mt-0.5"></div>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-[#576352]">Classification Engine</div>
+            <div id="success-engine-badge" class="mt-0.5"></div>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-[#576352]">Locality</div>
+            <div id="success-locality" class="text-sm font-medium text-[#2E3D28] mt-0.5"></div>
+          </div>
+        </div>
+
+        <div id="success-image-preview-box" class="hidden p-3 bg-[#F8F9F5] border border-[#D5D7C9] rounded-lg">
+          <div class="text-xs font-semibold text-[#576352] mb-2">Attached Photo Evidence:</div>
+          <img id="success-image-thumb" src="" alt="Submitted complaint photo" class="max-h-48 rounded border border-[#D5D7C9] object-contain" />
+        </div>
+
+        <div class="bg-[#F8F9F5] border-l-4 border-[#2E3D28] p-3 rounded text-xs">
+          <div class="font-bold text-[#2E3D28] uppercase tracking-wide text-[11px] mb-1">Transparent Priority Justification</div>
+          <p id="success-reason" class="text-[#1E251B] leading-relaxed"></p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <button id="success-track-btn" class="btn-primary">
+            <i data-lucide="search" class="w-4 h-4"></i>
+            <span>Track this complaint</span>
+          </button>
+          <button id="submit-another-btn" class="btn-secondary">
+            <span>Submit another complaint</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =======================================================
+         SCREEN 3: TRACK COMPLAINT
+         ======================================================= -->
+    <section id="screen-track" class="max-w-4xl mx-auto space-y-6 hidden">
+      <div>
+        <h1 class="text-2xl font-bold text-[#2E3D28] tracking-tight">Track Complaint Status</h1>
+        <p class="text-sm text-[#576352] mt-1">
+          Enter your unique tracking ID to view public-safe status, category, and redressal timeline.
+        </p>
+      </div>
+
+      <!-- Search Card -->
+      <div class="bg-white rounded-lg border border-[#D5D7C9] p-6 shadow-sm space-y-4">
+        <form id="track-form" class="flex flex-col sm:flex-row gap-3">
+          <div class="flex-1 space-y-1">
+            <label for="track-id-input" class="block text-xs font-semibold text-[#2E3D28]">Tracking ID *</label>
+            <input type="text" id="track-id-input" placeholder="e.g. CF-2026-1001" required
+              class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3.5 py-2 text-sm text-[#1E251B] uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-[#2E3D28]" />
+          </div>
+          <div class="sm:self-end">
+            <button type="submit" class="btn-primary w-full sm:w-auto">
+              <i data-lucide="search" class="w-4 h-4"></i>
+              <span>Track status</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Quick Demo Chips -->
+        <div class="pt-2 border-t border-[#D5D7C9]/60">
+          <div class="text-xs text-[#576352] mb-2 font-medium">Quick reference IDs for instant testing:</div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="trackComplaintById('CF-2026-1001')" class="text-xs bg-[#F8F9F5] hover:bg-[#A9B887]/20 border border-[#D5D7C9] px-2.5 py-1 rounded text-[#2E3D28] font-mono">CF-2026-1001</button>
+            <button onclick="trackComplaintById('CF-2026-1002')" class="text-xs bg-[#F8F9F5] hover:bg-[#A9B887]/20 border border-[#D5D7C9] px-2.5 py-1 rounded text-[#2E3D28] font-mono">CF-2026-1002</button>
+            <button onclick="trackComplaintById('CF-2026-1003')" class="text-xs bg-[#F8F9F5] hover:bg-[#A9B887]/20 border border-[#D5D7C9] px-2.5 py-1 rounded text-[#2E3D28] font-mono">CF-2026-1003</button>
+            <button onclick="trackComplaintById('CF-2026-1004')" class="text-xs bg-[#F8F9F5] hover:bg-[#A9B887]/20 border border-[#D5D7C9] px-2.5 py-1 rounded text-[#2E3D28] font-mono">CF-2026-1004</button>
+            <button onclick="trackComplaintById('CF-2026-1006')" class="text-xs bg-[#F8F9F5] hover:bg-[#A9B887]/20 border border-[#D5D7C9] px-2.5 py-1 rounded text-[#2E3D28] font-mono">CF-2026-1006</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Public Tracking Result Card -->
+      <div id="track-result-container" class="hidden bg-white rounded-lg border border-[#D5D7C9] border-t-4 border-t-[#2E3D28] p-6 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between pb-4 border-b border-[#D5D7C9]/60 gap-3">
+          <div>
+            <div class="text-xs font-bold text-[#576352] uppercase tracking-wider">Public Grievance Record</div>
+            <h2 id="track-res-title" class="text-xl font-bold text-[#2E3D28] mt-0.5"></h2>
+            <div id="track-res-locality" class="text-xs text-[#576352] mt-1"></div>
+          </div>
+          <div class="flex flex-col sm:items-end gap-1.5">
+            <span id="track-res-id" class="text-base font-bold text-[#2E3D28] font-mono"></span>
+            <div id="track-res-status-badge"></div>
+          </div>
+        </div>
+
+        <!-- Visual Progression Timeline (Submitted -> In Review -> In Progress -> Resolved) -->
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider text-[#2E3D28] mb-3">Live Redressal Timeline</div>
+          <div class="relative py-4">
+            <div class="absolute top-8 left-6 right-6 h-0.5 bg-[#D5D7C9] z-0"></div>
+            <div id="timeline-steps-container" class="flex justify-between items-start relative z-10">
+              <!-- Dynamically rendered timeline nodes -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Authority Allocation Box -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-[#F8F9F5] rounded-lg border border-[#D5D7C9]/70">
+          <div>
+            <div class="text-xs font-semibold text-[#576352]">Category</div>
+            <div id="track-res-cat" class="text-sm font-semibold text-[#2E3D28] mt-0.5"></div>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-[#576352]">Priority Rating</div>
+            <div id="track-res-priority-badge" class="mt-0.5"></div>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-[#576352]">Assigned Department</div>
+            <div id="track-res-dept" class="text-xs font-medium text-[#2E3D28] mt-0.5"></div>
+          </div>
+          <div>
+            <div class="text-xs font-semibold text-[#576352]">Submission Date</div>
+            <div id="track-res-created-date" class="text-xs font-medium text-[#2E3D28] mt-0.5"></div>
+          </div>
+        </div>
+
+        <!-- Attached Photo Preview (if present) -->
+        <div id="track-res-photo-box" class="hidden space-y-1">
+          <div class="text-xs font-semibold text-[#576352]">Resident Submitted Photo</div>
+          <img id="track-res-photo" src="" alt="Complaint photo" class="max-h-60 rounded-lg border border-[#D5D7C9] object-contain" />
+        </div>
+
+        <!-- Citizen Statement -->
+        <div class="space-y-1">
+          <div class="text-xs font-semibold text-[#576352]">Grievance Description</div>
+          <p id="track-res-desc" class="text-sm text-[#1E251B] p-3.5 bg-white border border-[#D5D7C9] rounded-lg leading-relaxed"></p>
+        </div>
+
+        <!-- Transparent Priority Reason -->
+        <div class="bg-[#F1F4EA] border-l-4 border-[#2E3D28] p-3.5 rounded text-xs text-[#2E3D28]">
+          <strong class="font-semibold">Priority Explanation:</strong> <span id="track-res-reason"></span>
+        </div>
+
+        <div id="track-res-updated" class="text-[11px] text-[#576352] text-right"></div>
+      </div>
+
+      <!-- Not Found Container -->
+      <div id="track-not-found" class="hidden bg-red-50 border border-red-200 rounded-lg p-5 text-sm text-red-900">
+        <div class="font-bold mb-1">Complaint Not Found</div>
+        <div>No record matches tracking ID <strong id="not-found-id"></strong>. Please check that you entered the full identifier in the format <code>CF-2026-XXXX</code>.</div>
+      </div>
+    </section>
+
+
+    <!-- =======================================================
+         SCREEN 4: HOW IT WORKS & ABOUT
+         ======================================================= -->
+    <section id="screen-how-it-works" class="max-w-4xl mx-auto space-y-6 hidden">
+      <div>
+        <h1 class="text-2xl font-bold text-[#2E3D28] tracking-tight">How CivicFix Works</h1>
+        <p class="text-sm text-[#576352] mt-1">
+          A four-step civic participation and transparent redressal process for Lucknow.
+        </p>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#D5D7C9] p-6 md:p-8 shadow-sm space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="flex gap-4 items-start p-4 bg-[#F8F9F5] rounded-lg border border-[#D5D7C9]">
+            <div class="w-8 h-8 rounded-full bg-[#2E3D28] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">1</div>
+            <div class="space-y-1">
+              <h3 class="font-bold text-sm text-[#2E3D28]">Report a Problem</h3>
+              <p class="text-xs text-[#576352] leading-relaxed">
+                Spot a public safety, road, garbage, streetlight, or water issue in your neighbourhood and begin by entering a title.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 items-start p-4 bg-[#F8F9F5] rounded-lg border border-[#D5D7C9]">
+            <div class="w-8 h-8 rounded-full bg-[#2E3D28] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">2</div>
+            <div class="space-y-1">
+              <h3 class="font-bold text-sm text-[#2E3D28]">Add Details and a Photo</h3>
+              <p class="text-xs text-[#576352] leading-relaxed">
+                Choose your locality, add landmark notes, and optionally upload photo evidence to help demonstrate the severity.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 items-start p-4 bg-[#F8F9F5] rounded-lg border border-[#D5D7C9]">
+            <div class="w-8 h-8 rounded-full bg-[#2E3D28] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">3</div>
+            <div class="space-y-1">
+              <h3 class="font-bold text-sm text-[#2E3D28]">Receive a Tracking ID</h3>
+              <p class="text-xs text-[#576352] leading-relaxed">
+                Receive an immediate reference ID (CF-2026-XXXX) along with transparent AI category and priority recommendations.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex gap-4 items-start p-4 bg-[#F8F9F5] rounded-lg border border-[#D5D7C9]">
+            <div class="w-8 h-8 rounded-full bg-[#2E3D28] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">4</div>
+            <div class="space-y-1">
+              <h3 class="font-bold text-sm text-[#2E3D28]">Track Status Updates</h3>
+              <p class="text-xs text-[#576352] leading-relaxed">
+                Follow status updates in real time (Submitted → In Review → In Progress → Resolved) via the public tracking screen.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-lg bg-[#E8EDE0] border border-[#A9B887]/60 text-xs text-[#2E3D28] leading-relaxed">
+          <strong>Transparency Pledge:</strong> CIVICFIX AI is an independent demonstration prototype. It is not an official government portal and does not send complaints to municipal authorities.
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 5: ABOUT -->
+    <section id="screen-about" class="max-w-4xl mx-auto space-y-6 hidden">
+      <div>
+        <h1 class="text-2xl font-bold text-[#2E3D28] tracking-tight">About CivicFix AI</h1>
+        <p class="text-sm text-[#576352] mt-1">
+          Empowering communities and municipal staff through intelligent, transparent civic technology.
+        </p>
+      </div>
+
+      <div class="bg-white rounded-lg border border-[#D5D7C9] p-6 md:p-8 shadow-sm space-y-5 text-xs text-[#576352] leading-relaxed">
+        <h2 class="text-base font-bold text-[#2E3D28]">Our Mission for Lucknow</h2>
+        <p>
+          CIVICFIX AI was conceived to bridge the gap between everyday citizen awareness and municipal responsiveness. 
+          By combining accessible, human-centric design with modern artificial intelligence, we enable residents to document civic concerns clearly and transparently.
+        </p>
+
+        <h2 class="text-base font-bold text-[#2E3D28] pt-2">AI Ethics & Human-in-the-Loop</h2>
+        <p>
+          AI classifications and priority suggestions generated by Groq (or our deterministic municipal fallback) are advisory. 
+          Final administrative dispatch, prioritization, and resolution are strictly managed by human municipal officers.
+        </p>
+
+        <h2 class="text-base font-bold text-[#2E3D28] pt-2">Civic Privacy Standard</h2>
+        <p>
+          We follow strict data minimization: we do not harvest GPS breadcrumbs or residential addresses. 
+          Citizen contact details and internal operational logs are segregated from public tracking views.
+        </p>
+
+        <div class="p-4 rounded-lg bg-[#F8F9F5] border border-[#D5D7C9] text-[#2E3D28] font-medium">
+          "Together, Let's Make Lucknow Better. Every small action can help create a cleaner, safer, and more beautiful city."
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =======================================================
+         SCREEN 6: ADMIN PORTAL (MUNICIPAL OFFICER WORKSPACE)
+         ======================================================= -->
+    <section id="screen-admin" class="max-w-6xl mx-auto space-y-6 hidden">
+      
+      <!-- Admin Login / Demo Gate (when not logged in) -->
+      <div id="admin-login-gate" class="max-w-md mx-auto my-12 bg-white rounded-lg border-2 border-[#A9B887] p-8 shadow-md space-y-5 text-center">
+        <div class="w-12 h-12 rounded-full bg-[#2E3D28] text-[#A9B887] flex items-center justify-center mx-auto">
+          <i data-lucide="shield-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-[#2E3D28]">Municipal Officer Portal</h2>
+          <p class="text-xs text-[#576352] mt-1">Authorized access for Lucknow administrative personnel</p>
+        </div>
+
+        <form id="admin-login-form" class="space-y-4 text-left">
+          <div class="space-y-1">
+            <label class="block text-xs font-semibold text-[#2E3D28]">Demo Passcode</label>
+            <input type="password" id="admin-passcode-input" value="admin123" required
+              class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3.5 py-2 text-sm text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]" />
+            <p class="text-[11px] text-[#576352]">Demo evaluator key: <code>admin123</code></p>
+          </div>
+
+          <button type="submit" class="btn-primary w-full">
+            <i data-lucide="unlock" class="w-4 h-4"></i>
+            <span>Unlock Demonstration Console</span>
+          </button>
+        </form>
+
+        <div class="p-3 bg-[#F8F9F5] rounded text-[11px] text-[#576352] leading-relaxed border border-[#D5D7C9]">
+          <strong>Notice:</strong> This hackathon prototype provides local demo access for evaluators. It does not send notices to official municipal teams or claim production-grade security.
+        </div>
+      </div>
+
+      <!-- Admin Main Workspace (Visible once unlocked) -->
+      <div id="admin-workspace" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#D5D7C9]/60">
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-2xl font-bold text-[#2E3D28] tracking-tight">Municipal Officer Workspace</h1>
+              <span class="bg-[#A9B887]/30 text-[#2E3D28] text-xs font-bold px-2 py-0.5 rounded border border-[#A9B887]">Admin Active</span>
+            </div>
+            <p class="text-sm text-[#576352] mt-0.5">
+              Administrative triage, department assignment, and live resolution workflow for Lucknow Municipal Corporation.
+            </p>
+          </div>
+          <div>
+            <button onclick="lockAdminPortal()" class="text-xs text-[#B91C1C] hover:bg-red-50 border border-red-200 px-3 py-1.5 rounded-lg font-medium transition-colors flex items-center gap-1.5">
+              <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+              <span>Exit Admin Portal</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bento Grid Summary Cards (Live Database Counts) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" role="region" aria-label="Overview Metrics">
+          <div class="bg-white rounded-lg border border-[#D5D7C9] p-4 shadow-sm hover:border-[#A9B887] transition-all flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] font-semibold uppercase tracking-wider text-[#576352]">Total Reports</div>
+              <div id="bento-total" class="text-2xl font-bold text-[#2E3D28] mt-1">0</div>
+            </div>
+            <div class="text-[10px] text-[#576352] mt-2">All registered grievances</div>
+          </div>
+
+          <div class="bg-white rounded-lg border border-[#D5D7C9] border-l-4 border-l-[#475569] p-4 shadow-sm hover:border-[#A9B887] transition-all flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] font-semibold uppercase tracking-wider text-[#475569]">Submitted</div>
+              <div id="bento-submitted" class="text-2xl font-bold text-[#475569] mt-1">0</div>
+            </div>
+            <div class="text-[10px] text-[#576352] mt-2">New reports logged</div>
+          </div>
+
+          <div class="bg-white rounded-lg border border-[#D5D7C9] border-l-4 border-l-[#D97706] p-4 shadow-sm hover:border-[#A9B887] transition-all flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] font-semibold uppercase tracking-wider text-[#92400E]">In Review</div>
+              <div id="bento-review" class="text-2xl font-bold text-[#B45309] mt-1">0</div>
+            </div>
+            <div class="text-[10px] text-[#576352] mt-2">Under officer evaluation</div>
+          </div>
+
+          <div class="bg-white rounded-lg border border-[#D5D7C9] border-l-4 border-l-[#2563EB] p-4 shadow-sm hover:border-[#A9B887] transition-all flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] font-semibold uppercase tracking-wider text-[#1E40AF]">In Progress</div>
+              <div id="bento-progress" class="text-2xl font-bold text-[#2563EB] mt-1">0</div>
+            </div>
+            <div class="text-[10px] text-[#576352] mt-2">Active with zonal teams</div>
+          </div>
+
+          <div class="bg-white rounded-lg border border-[#D5D7C9] border-l-4 border-l-[#16A34A] p-4 shadow-sm hover:border-[#A9B887] transition-all flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] font-semibold uppercase tracking-wider text-[#166534]">Resolved</div>
+              <div id="bento-resolved" class="text-2xl font-bold text-[#15803D] mt-1">0</div>
+            </div>
+            <div class="text-[10px] text-[#576352] mt-2">Completed issues</div>
+          </div>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="bg-white rounded-lg border border-[#D5D7C9] p-5 shadow-sm space-y-3">
+          <div class="text-xs font-bold uppercase tracking-wider text-[#2E3D28]">Filter Grievance Registry</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-[#576352] mb-1">Search Registry</label>
+              <input type="text" id="admin-search-input" placeholder="Search ID, title, keyword..."
+                class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-xs text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-[#576352] mb-1">Locality Filter</label>
+              <select id="admin-filter-loc" class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-xs text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-[#576352] mb-1">Category Filter</label>
+              <select id="admin-filter-cat" class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-xs text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-[#576352] mb-1">Priority Filter</label>
+              <select id="admin-filter-prio" class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-xs text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]">
+                <option value="All">All Priorities</option>
+                <option value="High">High Priority</option>
+                <option value="Medium">Medium Priority</option>
+                <option value="Low">Low Priority</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-[#576352] mb-1">Status Filter</label>
+              <select id="admin-filter-stat" class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-xs text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]">
+                <option value="All">All Statuses</option>
+                <option value="Submitted">Submitted</option>
+                <option value="In Review">In Review</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grievance Action Inspector Drawer -->
+        <div id="admin-inspector-card" class="hidden bg-white rounded-lg border-2 border-[#A9B887] p-6 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between pb-3 border-b border-[#D5D7C9]/60 gap-3">
+            <div>
+              <div id="inspect-id" class="text-xs font-bold text-[#576352] uppercase font-mono"></div>
+              <h2 id="inspect-title" class="text-lg font-bold text-[#2E3D28] mt-0.5"></h2>
+              <div id="inspect-locality" class="text-xs text-[#576352] mt-0.5"></div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="inspect-priority-badge"></span>
+              <span id="inspect-status-badge"></span>
+              <span id="inspect-source-badge"></span>
+            </div>
+          </div>
+
+          <!-- Uploaded Photo Inspector Box (if present) -->
+          <div id="inspect-photo-box" class="hidden p-3 bg-[#F8F9F5] border border-[#D5D7C9] rounded-lg">
+            <div class="text-xs font-semibold text-[#576352] mb-2 flex items-center justify-between">
+              <span>Attached Photo Evidence:</span>
+              <a id="inspect-photo-link" href="" target="_blank" class="text-[#2E3D28] hover:underline font-medium">Open full image ↗</a>
+            </div>
+            <img id="inspect-photo-img" src="" alt="Citizen uploaded photo" class="max-h-56 rounded border border-[#D5D7C9] object-contain" />
+          </div>
+
+          <!-- Citizen Description -->
+          <div class="space-y-1">
+            <div class="text-xs font-semibold text-[#576352]">Citizen Description</div>
+            <p id="inspect-desc" class="text-xs text-[#1E251B] p-3 bg-[#F8F9F5] border border-[#D5D7C9]/70 rounded-lg leading-relaxed"></p>
+          </div>
+
+          <!-- Transparent Justification -->
+          <div class="bg-[#FFFBEB] border-l-4 border-[#D97706] p-3 rounded text-xs text-[#78350F]">
+            <strong>Classification Reason:</strong> <span id="inspect-reason"></span>
+          </div>
+
+          <!-- Advisory Duplicate Alert -->
+          <div id="inspect-dup-alert" class="hidden bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-900">
+            ⚠️ <strong>Advisory Duplicate Notice:</strong> <span id="inspect-dup-text"></span>
+          </div>
+
+          <!-- Department Dispatch & Officer Assignment Form -->
+          <form id="admin-update-form" class="pt-3 border-t border-[#D5D7C9]/60 space-y-4">
+            <div class="text-xs font-bold uppercase tracking-wider text-[#2E3D28]">Officer Action & Department Dispatch</div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-[#576352] mb-1">Assign Demo Department *</label>
+                <select id="admin-edit-dept" required class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-xs text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-[#576352] mb-1">Designated Officer *</label>
+                <input type="text" id="admin-edit-officer" placeholder="e.g. Er. Rajesh Verma"
+                  class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-xs text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-[#576352] mb-1">Update Status *</label>
+                <select id="admin-edit-status" required class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-xs text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]">
+                  <option value="Submitted">Submitted</option>
+                  <option value="In Review">In Review</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Internal Admin Note Field -->
+            <div class="space-y-1">
+              <label for="admin-edit-notes" class="block text-[11px] font-semibold text-[#576352]">Internal Administrative Note (Staff Only)</label>
+              <textarea id="admin-edit-notes" rows="2" placeholder="Record internal dispatch notes, team references, or work-order numbers (kept private from resident view)..."
+                class="w-full bg-white border border-[#D5D7C9] rounded-lg px-3 py-1.5 text-xs text-[#1E251B] focus:outline-none focus:ring-2 focus:ring-[#2E3D28]"></textarea>
+            </div>
+
+            <div class="pt-1 flex items-center justify-between">
+              <button type="submit" id="admin-save-btn" class="btn-primary">
+                <i data-lucide="check" class="w-4 h-4"></i>
+                <span>Save changes</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Audit Log / Status History -->
+          <div class="pt-3 border-t border-[#D5D7C9]/60">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-[#576352] mb-2">Status Audit Trail</div>
+            <div id="inspect-status-history" class="space-y-1 text-xs text-[#576352]">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Registry Table -->
+        <div class="bg-white rounded-lg border border-[#D5D7C9] p-5 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="text-sm font-bold text-[#2E3D28]">Grievance Registry <span id="admin-records-count" class="text-xs text-[#576352] font-normal"></span></div>
+            <div class="text-xs text-[#576352]">Click any row to inspect & manage</div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-[#D5D7C9] text-[11px] uppercase tracking-wider font-bold text-[#576352]">
+                  <th class="py-2.5 px-4">Tracking ID</th>
+                  <th class="py-2.5 px-4">Grievance & Locality</th>
+                  <th class="py-2.5 px-4">Category</th>
+                  <th class="py-2.5 px-4">Priority</th>
+                  <th class="py-2.5 px-4">Status</th>
+                  <th class="py-2.5 px-4">Assigned Team</th>
+                  <th class="py-2.5 px-4">Logged At</th>
+                </tr>
+              </thead>
+              <tbody id="admin-complaints-tbody" class="divide-y divide-[#D5D7C9]/40">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+       DUPLICATE COMPLAINT CONFIRMATION MODAL (ADVISORY & EXPLAINABLE)
+       ========================================================= -->
+  <div id="duplicate-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-lg border-2 border-[#FCD34D] max-w-lg w-full p-6 shadow-xl space-y-4">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-full bg-[#FEF3C7] text-[#B45309] flex items-center justify-center flex-shrink-0">
+          <i data-lucide="copy" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-[#2E3D28]">Advisory: Similar Report Already Active</h3>
+          <p class="text-xs text-[#576352] mt-0.5">A related grievance is currently being tracked in your neighborhood.</p>
+        </div>
+      </div>
+
+      <div class="p-3.5 bg-[#FFFBEB] rounded-lg border border-[#FDE68A] text-xs space-y-2">
+        <div class="flex justify-between items-center">
+          <span class="font-bold text-[#2E3D28]" id="dup-modal-id">CF-2026-XXXX</span>
+          <span class="badge badge-status-review px-2 py-0.5 rounded text-[11px]" id="dup-modal-status">In Review</span>
+        </div>
+        <div class="text-[#1E251B] font-medium" id="dup-modal-title"></div>
+        <div class="text-[11px] text-[#78350F]" id="dup-modal-explanation"></div>
+      </div>
+
+      <div class="text-xs text-[#576352] leading-relaxed">
+        <strong>Civic Advisory:</strong> Submitting a duplicate does not accelerate repair times and may divide field resources. Would you prefer to follow the existing report or submit this as a distinct incident?
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-2 justify-end pt-2">
+        <button type="button" id="dup-modal-track-btn" class="btn-secondary text-xs">
+          <i data-lucide="search" class="w-3.5 h-3.5"></i>
+          <span>Track Existing Complaint</span>
+        </button>
+        <button type="button" id="dup-modal-proceed-btn" class="btn-primary text-xs bg-[#B45309] border-[#B45309] hover:bg-[#92400E]">
+          <span>Submit Anyway</span>
+        </button>
+        <button type="button" id="dup-modal-cancel-btn" class="text-xs text-[#576352] hover:text-[#1E251B] px-3 py-2">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Alert -->
+  <div id="toast-notification" class="fixed bottom-6 right-6 bg-[#2E3D28] text-white px-5 py-3 rounded-lg shadow-lg text-sm transition-opacity duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2 border border-[#A9B887]/40">
+    Notification
+  </div>
+
+  <!-- Application Logic -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
